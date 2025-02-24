@@ -1,0 +1,31 @@
+name: Build docker image and deploy to ITAS DO servers
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    name: "Deploy to ITAS DO server"
+    runs-on: itas276-rsingh  # runner label
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      
+      - name: Test files are visible
+        run: |
+          whoami
+          ls -lah
+      
+      - name: Build Docker image
+        run: |
+          docker build -t docker101-app .
+          
+      - name: Run Docker container
+        run: |
+          docker stop docker101-app || true
+          docker rm docker101-app || true
+          docker run -d -p 3000:3000 --name docker101-app docker101-app

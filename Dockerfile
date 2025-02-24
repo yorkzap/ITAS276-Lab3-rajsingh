@@ -1,5 +1,16 @@
 FROM node:10-alpine
-WORKDIR /
-COPY . .
+
+# Create app directory
+WORKDIR /app
+
+# Install app dependencies
+COPY package*.json ./
 RUN yarn install --production
-CMD ["node", "/src/index.js"]
+
+# Bundle app source
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+CMD ["node", "src/index.js"]
