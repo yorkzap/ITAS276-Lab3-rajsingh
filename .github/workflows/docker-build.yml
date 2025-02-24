@@ -9,7 +9,7 @@ on:
 jobs:
   deploy:
     name: "Deploy to ITAS DO server"
-    runs-on: itas276-rsingh  # runner label
+    runs-on: self-hosted
     
     steps:
       - name: Check out repository
@@ -22,10 +22,20 @@ jobs:
       
       - name: Build Docker image
         run: |
-          docker build -t docker101-app .
+          sudo docker build -t docker101-app:latest .
           
       - name: Run Docker container
         run: |
-          docker stop docker101-app || true
-          docker rm docker101-app || true
-          docker run -d -p 3000:3000 --name docker101-app docker101-app
+          sudo docker stop docker101-app || true
+          sudo docker rm docker101-app || true
+          sudo docker run -d \
+            --name docker101-app \
+            -p 3000:3000 \
+            --restart unless-stopped \
+            docker101-app:latest
+          
+      - name: Verify deployment
+        run: |
+          echo "Waiting for container to start..."
+          sleep 5
+          sudo docker ps | grep docker101-app
