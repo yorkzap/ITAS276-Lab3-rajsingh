@@ -19,16 +19,25 @@ jobs:
         run: |
           whoami
           ls -lah
+          
+      - name: Check Docker access
+        run: |
+          docker ps
+          docker --version
       
       - name: Build Docker image
         run: |
-          sudo docker build -t docker101-app:latest .
+          echo "Starting Docker build..."
+          docker build --no-cache -t docker101-app:latest .
+          echo "Docker build completed"
           
       - name: Run Docker container
         run: |
-          sudo docker stop docker101-app || true
-          sudo docker rm docker101-app || true
-          sudo docker run -d \
+          echo "Stopping existing container..."
+          docker stop docker101-app || true
+          docker rm docker101-app || true
+          echo "Starting new container..."
+          docker run -d \
             --name docker101-app \
             -p 3000:3000 \
             --restart unless-stopped \
@@ -36,6 +45,7 @@ jobs:
           
       - name: Verify deployment
         run: |
-          echo "Waiting for container to start..."
-          sleep 5
-          sudo docker ps | grep docker101-app
+          echo "Container status:"
+          docker ps | grep docker101-app
+          echo "Container logs:"
+          docker logs docker101-app
